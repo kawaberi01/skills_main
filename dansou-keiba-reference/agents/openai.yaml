@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: 断層競馬参考
+  short_description: 南関API材料から断層競馬の参考欄を固定テンプレートで出す
+  default_prompt: 断層競馬の参考出力を固定テンプレートで出してください。

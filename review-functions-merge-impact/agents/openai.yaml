@@ -1,0 +1,4 @@
+interface:
+  display_name: "Functions マージ影響レビュー"
+  short_description: "main マージ時の他 Functions 影響を定型検証"
+  default_prompt: "$review-functions-merge-impact を使用して、現在のブランチが他の Functions に与える影響をレビューしてください。"

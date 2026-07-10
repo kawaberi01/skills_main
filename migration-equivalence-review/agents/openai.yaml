@@ -1,0 +1,3 @@
+display_name: 移行同等性レビュー
+short_description: 移行元と移行先の処理同等性をテンプレート形式で確認します。
+default_prompt: TARGET_NAME と OLD_SOURCE_PATH を指定して、main 差分の移行同等性をレビューしてください。

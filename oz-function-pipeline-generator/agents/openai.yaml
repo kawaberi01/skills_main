@@ -1,0 +1,4 @@
+interface:
+  display_name: "OZ Functions Pipeline Generator"
+  short_description: "OZ Functions向けAzure Pipelineを対話生成します"
+  default_prompt: "Use $oz-function-pipeline-generator to create an Azure DevOps deployment pipeline for a newly added Functions project."

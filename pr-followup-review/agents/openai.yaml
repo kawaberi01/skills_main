@@ -1,0 +1,3 @@
+display_name: PR再指摘確認
+short_description: PR初回指摘の対応状況を再確認し、テンプレート形式で結果を出力します。
+default_prompt: PR_URL と TARGET_NAME を指定して、未クローズ指摘の対応状況を確認してください。

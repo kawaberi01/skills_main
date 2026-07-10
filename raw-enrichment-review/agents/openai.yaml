@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAW Enrichment Review"
+  short_description: "Review uncertain book metadata matches"
+  default_prompt: "Use $raw-enrichment-review to triage uncertain enrichment results."

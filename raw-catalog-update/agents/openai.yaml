@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAW Catalog Update"
+  short_description: "Refresh the NAS catalog and delta outputs."
+  default_prompt: "Use $raw-catalog-update to rescan the NAS library and regenerate the local catalog outputs."

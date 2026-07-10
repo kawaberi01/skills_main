@@ -1,0 +1,4 @@
+interface:
+  display_name: "日次予想ログ"
+  short_description: "競馬予想の生ログを日次ファイルへ固定記録する運用"
+  default_prompt: "Use $daily-prediction-log to create and maintain today's local horse-racing prediction log for this thread."

@@ -1,0 +1,114 @@
+[このテンプレートで行うこと]
+develop 環境向け http Function App の Terraform 定義を作るための入力票です。
+このテンプレートに記入した値をもとに、main.tf / variables.tf / backend.hcl を作成します。
+値を変更しなければ、その値が設定されます。
+説明欄は補足であり、設定値そのものではありません。
+
+[基本情報]
+種別=http
+workload名=<記入してください>
+4桁サフィックス=<記入してください>
+Resource Group=oz-test-functions
+Location=japaneast
+
+[基本情報の説明]
+種別
+http 固定です。
+
+workload名
+リソース名やタグのベースになる名前です。
+
+4桁サフィックス
+リソースをひとまとまりで識別する小文字英数字4桁です。
+
+Resource Group
+Function App を配置する Resource Group です。通常は変更しません。
+
+Location
+Azure リージョンです。通常は `japaneast` を使います。
+
+[監視]
+Monitoring Resource Group=oz-test-monitoring
+Log Analytics Workspace=law-develop-platform
+
+[監視の説明]
+Monitoring Resource Group
+Log Analytics Workspace を配置している Resource Group です。
+
+Log Analytics Workspace
+Application Insights と関連付ける共用 Workspace 名です。
+
+[ネットワーク]
+VNet統合=yes
+VNet Resource Group=oz-test-vnet
+VNet名=oz-test-vnet-001
+Subnet名=functions-http
+
+[ネットワークの説明]
+VNet統合
+Flex Function App で VNet 統合を使うかどうかです。通常は `yes` です。
+
+VNet Resource Group
+VNet を配置している Resource Group です。
+
+VNet名
+統合先 VNet 名です。
+
+Subnet名
+http 用サブネット名です。通常は `functions-http` を使います。
+
+[Hosting]
+module=workload_functionapp_flex
+profile=flex_standard
+
+[Hosting の説明]
+module
+利用する Terraform module です。http では `workload_functionapp_flex` 固定です。
+
+profile
+Flex 用 hosting profile です。通常は `flex_standard` を使います。
+
+[命名]
+Function App名=func-<workload名>-<suffix>
+Storage Account名=strage0<suffix>
+Application Insights名=appi-<workload名>-<suffix>
+
+[命名の説明]
+Function App名
+workload名 と 4桁サフィックスから組み立てます。
+
+Storage Account名
+`strage0` + 4桁サフィックスを基本にしつつ、Azure の長さ制約に収まるか確認します。
+
+Application Insights名
+workload名 と 4桁サフィックスから組み立てます。
+
+[既定で入るApp Settings]
+AppConfig__Endpoint=https://common-config.azconfig.io
+AzureAppConfiguration__Endpoint=https://common-config.azconfig.io
+<program-defined-Schedule-key>=<program-defined-value>
+WEBSITE_ENABLE_SYNC_UPDATE_SITE=true
+WEBSITE_RUN_FROM_PACKAGE=1
+
+[App Settings の説明]
+AppConfig__Endpoint
+Azure App Configuration の接続先 URL です。
+
+AzureAppConfiguration__Endpoint
+アプリが参照する App Configuration の endpoint です。
+
+<program-defined-Schedule-key>
+プログラム仕様で規定された `**********Schedule` 系のキーです。
+必ず設定します。キー名と値はプログラム定義に従って置き換えてください。
+
+WEBSITE_ENABLE_SYNC_UPDATE_SITE
+デプロイ時の同期更新設定です。通常は変更しません。
+
+WEBSITE_RUN_FROM_PACKAGE
+パッケージから実行する設定です。通常は変更しません。
+
+[追加する個別App Settings]
+KEY=VALUE
+
+[削除したい既定App Settings]
+KEY

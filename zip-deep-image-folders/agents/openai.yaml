@@ -1,0 +1,4 @@
+interface:
+  display_name: "Zip Deep Image Folders"
+  short_description: "Zip leaf image folders and normalize volume names"
+  default_prompt: "Use $zip-deep-image-folders to zip the deepest image folders, then copy and rename the root ZIPs into normalized volume archives."

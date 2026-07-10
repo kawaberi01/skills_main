@@ -1,0 +1,126 @@
+# -----------------------------------------------------------------------------
+# 名称     : __PIPELINE_TITLE__
+# 目的     : __PIPELINE_PURPOSE__
+# 対象     : __PROJECT_PATH__
+# 起動条件 : __TRIGGER_DESCRIPTION__
+# 範囲     : NuGet 復元、ビルド、関連テスト、publish、Azure Functions デプロイ
+# 対象外   : Pull Request トリガー、統合テスト、本番環境デプロイ
+# 備考     : Azure Functions への反映は runFromPackage で実行する
+# -----------------------------------------------------------------------------
+
+trigger:
+  branches:
+    exclude:
+      - '*'
+  tags:
+    include:
+      - dev/*
+
+pr: none
+
+variables:
+  # ビルド構成です。
+  buildConfiguration: 'Release'
+  # デプロイ対象の Function プロジェクトです。
+  project: '__PROJECT_PATH__'
+  # 関連テストを含むテスト プロジェクトです。
+  testProject: '__TEST_PROJECT_PATH__'
+  # 実行エージェントのイメージです。
+  vmImage: 'windows-latest'
+  # Azure へ接続するサービス コネクションです。
+  azureSubscription: '__AZURE_SUBSCRIPTION__'
+  # デプロイ先の Function App 名です。
+  functionAppName: '__FUNCTION_APP_NAME__'
+  # デプロイ先の Function App 種別です。
+  functionAppType: 'functionApp'
+  # Azure DevOps のデプロイ環境名です。
+  environment: '__ENVIRONMENT_NAME__'
+  # パイプライン成果物の名前です。
+  artifactName: '__ARTIFACT_NAME__'
+  # 使用する .NET SDK のバージョンです。
+  dotnetSdkVersion: '10.0.x'
+  # publish 出力先のフォルダです。
+  publishOutput: '$(Build.ArtifactStagingDirectory)/publish'
+
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          # 必要な .NET SDK を導入します。
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetSdkVersion)'
+              performMultiLevelLookup: true
+
+          # Azure Artifacts へアクセスするための認証を構成します。
+          - task: NuGetAuthenticate@1
+            displayName: 'Authenticate to Azure Artifacts'
+
+          # ビルドとテストに必要な NuGet パッケージを復元します。
+          - pwsh: |
+              dotnet restore "$(project)" --configfile NuGet.Config
+              dotnet restore "$(testProject)" --configfile NuGet.Config
+            displayName: 'Restore'
+
+          # __LOGICAL_NAME__ __KIND__ の Function プロジェクトをビルドします。
+          - pwsh: |
+              dotnet build "$(project)" --configuration "$(buildConfiguration)" --no-restore
+              dotnet build "$(testProject)" --configuration "$(buildConfiguration)" --no-restore
+            displayName: 'Build'
+
+          # 関連するアプリケーションテストを実行します。
+          - pwsh: |
+              dotnet test "$(testProject)" --configuration "$(buildConfiguration)" --no-restore --no-build --filter "__TEST_FILTER__"
+            displayName: 'Test application tests'
+
+          # デプロイ用の Function 成果物を publish します。
+          - pwsh: |
+              dotnet publish "$(project)" --configuration "$(buildConfiguration)" --no-restore --no-build --output "$(publishOutput)"
+            displayName: 'Publish'
+
+          # publish 出力をデプロイ用 zip にまとめます。
+          - task: ArchiveFiles@2
+            displayName: 'Archive publish output'
+            inputs:
+              rootFolderOrFile: '$(publishOutput)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(artifactName).zip'
+              replaceExistingArchive: true
+
+          # デプロイ用パッケージをパイプライン成果物として公開します。
+          - publish: '$(Build.ArtifactStagingDirectory)/$(artifactName).zip'
+            displayName: 'Publish artifact'
+            artifact: '$(artifactName)'
+
+  - stage: Deploy
+    displayName: Deploy
+    dependsOn: Build
+    # Build 成功時に、dev/* タグ実行または Azure DevOps 画面からの手動実行で Deploy します。
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.Reason'], 'Manual')))
+    jobs:
+      - deployment: DeployAzureFunctions
+        displayName: Deploy
+        environment: '$(environment)'
+        pool:
+          vmImage: $(vmImage)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                # 作成したパッケージを Azure Functions へデプロイします。
+                - task: AzureFunctionApp@1
+                  displayName: 'Deploy to Azure Functions'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: '$(functionAppType)'
+                    appName: '$(functionAppName)'
+                    package: '$(Pipeline.Workspace)/$(artifactName)/$(artifactName).zip'
+                    deploymentMethod: 'runFromPackage'

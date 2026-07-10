@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAW Enrichment Prepare"
+  short_description: "Create a safe incremental enrichment queue"
+  default_prompt: "Use $raw-enrichment-prepare to create the next safe enrichment batch."

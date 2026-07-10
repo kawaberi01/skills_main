@@ -1,0 +1,4 @@
+interface:
+  display_name: "PDF to JPG ZIP"
+  short_description: "Split PDFs into JPG folders and zip them"
+  default_prompt: "Use $pdf-to-jpg-zip to split a PDF into per-page JPG files, place them in a folder, and zip that folder."

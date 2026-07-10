@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAW Enrichment Publish"
+  short_description: "Publish trusted book metadata to catalog"
+  default_prompt: "Use $raw-enrichment-publish to rebuild the catalog from reviewed enrichment data."

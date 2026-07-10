@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAW Enrichment Fetch"
+  short_description: "Fetch and cache book metadata safely"
+  default_prompt: "Use $raw-enrichment-fetch to run a controlled book enrichment batch."
