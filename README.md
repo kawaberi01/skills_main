@@ -1,0 +1,2 @@
+# skills_main
+メインスキル
