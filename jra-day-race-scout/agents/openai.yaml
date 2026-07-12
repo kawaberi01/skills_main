@@ -1,0 +1,4 @@
+interface:
+  display_name: "JRA Day Race Scout"
+  short_description: "Scout up to five JRA races for detailed prediction"
+  default_prompt: "Use $jra-day-race-scout to scout JRA races before the first post time."
